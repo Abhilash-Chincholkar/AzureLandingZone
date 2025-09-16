@@ -1,0 +1,13 @@
+    steps:
+    - task: TerraformTask@5
+      displayName: TerraformInit
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Env/Dev'
+        backendAzureRmUseEntraIdForAuthentication: false
+        backendServiceArm: 'ServiceConnection'
+        backendAzureRmResourceGroupName: 'Terraform-Stg-Account'
+        backendAzureRmStorageAccountName: 'tfstgact'
+        backendAzureRmContainerName: 'terraform'
+        backendAzureRmKey: 'terraform.tfstate'
