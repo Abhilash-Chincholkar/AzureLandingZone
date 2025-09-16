@@ -1,5 +1,5 @@
 trigger:
-- main
+- none
 
 pool: Test
 
@@ -52,6 +52,7 @@ stages:
     steps:
     - template: templates/template.yaml
     - task: TerraformTask@5
+      displayName: TerraformApply
       inputs:
         provider: 'azurerm'
         command: 'apply'
