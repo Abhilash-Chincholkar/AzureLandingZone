@@ -5,9 +5,9 @@ pool: Test
 
 stages: 
 - stage: 
-  displayName: Terraform-Install-Init
+  displayName: TerraformInstallInit
   jobs:
-  - job: Terraform-Install-Init
+  - job: TerraformInstallInit
     steps:
     - task: TerraformInstaller@1
       inputs:
