@@ -4,52 +4,59 @@ trigger:
 pool: Test
 
 stages: 
-- stage: 
+- stage: TerraformInstallInit
   displayName: TerraformInstallInit
   jobs:
   - job: TerraformInstallInit
+    displayName: terraform Install and Init
     steps:
     - task: TerraformInstaller@1
       displayName: TerraformInit
       inputs:
         terraformVersion: 'latest'
     - template: templates/template.yaml
-    # - task: TerraformTask@5
-    #   displayName: TerraformInit
-    #   inputs:
-    #     provider: 'azurerm'
-    #     command: 'init'
-    #     workingDirectory: '$(System.DefaultWorkingDirectory)/Env/Dev'
-    #     backendAzureRmUseEntraIdForAuthentication: false
-    #     backendServiceArm: 'ServiceConnection'
-    #     backendAzureRmResourceGroupName: 'Terraform-Stg-Account'
-    #     backendAzureRmStorageAccountName: 'tfstgact'
-    #     backendAzureRmContainerName: 'terraform'
-    #     backendAzureRmKey: 'terraform.tfstate'
-  
+
   - job: TerraformPlan
     dependsOn: TerraformInstallInit
     displayName: TerraformPlan
     steps:
     - template: templates/template.yaml
-    # - task: TerraformTask@5
-    #   displayName: TerraformInit
-    #   inputs:
-    #     provider: 'azurerm'
-    #     command: 'init'
-    #     workingDirectory: '$(System.DefaultWorkingDirectory)/Env/Dev'
-    #     backendAzureRmUseEntraIdForAuthentication: false
-    #     backendServiceArm: 'ServiceConnection'
-    #     backendAzureRmResourceGroupName: 'Terraform-Stg-Account'
-    #     backendAzureRmStorageAccountName: 'tfstgact'
-    #     backendAzureRmContainerName: 'terraform'
-    #     backendAzureRmKey: 'terraform.tfstate'
     - task: TerraformTask@5
       displayName: TerraformPlan
       inputs:
         provider: 'azurerm'
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/Env/dev'
+        environmentServiceNameAzureRM: 'ServiceConnection'
+
+- stage: ManualValidation
+  dependsOn: TerraformInstallInit
+  displayName: ManualValidation
+  pool: server
+  jobs:
+  - job: ManualValidation
+    displayName: Manual Approval
+    steps:
+    - task: ManualValidation@1
+      displayName: manual approval
+      inputs:
+        notifyUsers: 'abhilashchincholkar@gmail.com'
+        approvers: 'abhilashchincholkar@gmail.com'
+        instructions: 'Please check the plan and approve'
+
+- stage: TerraformApply
+  dependsOn: ManualValidation
+  displayName: TerraformApply
+  jobs:
+  - job: TerraformInitApply
+    steps:
+    - template: templates/template.yaml
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Env/dev'
+        commandOptions: '-auto-approve'
         environmentServiceNameAzureRM: 'ServiceConnection'
     
 
