@@ -10,9 +10,11 @@ stages:
   - job: TerraformInstallInit
     steps:
     - task: TerraformInstaller@1
+      displayName: TerraformInit
       inputs:
         terraformVersion: 'latest'
     - task: TerraformTask@5
+      displayName: TerraformInit
       inputs:
         provider: 'azurerm'
         command: 'init'
@@ -23,5 +25,16 @@ stages:
         backendAzureRmStorageAccountName: 'tfstgact'
         backendAzureRmContainerName: 'terraform'
         backendAzureRmKey: 'terraform.tfstate'
+  
+  - job: TerraformPlan
+    displayName: TerraformPlan
+    steps:
+    - task: TerraformTask@5
+      displayName: TerraformPlan
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Env/dev'
+        environmentServiceNameAzureRM: 'ServiceConnection'
     
 
